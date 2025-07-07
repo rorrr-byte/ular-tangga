@@ -3,35 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icon.png" type="image/png" />
-  <title>Ular Tangga Foreplay 🔥</title>
+  <title>Ular Tangga Foreplay</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
       background-color: #fce4ec;
       margin: 0;
+      padding-bottom: 100px;
     }
     #board {
       display: grid;
-      grid-template-columns: repeat(10, 10vw);
-      grid-template-rows: repeat(10, 10vw);
-      gap: 2px;
-      margin: 10px auto;
-      width: 100vw;
-      max-width: 1000px;
+      grid-template-columns: repeat(6, 60px);
+      grid-template-rows: repeat(6, 60px);
+      gap: 5px;
+      margin: 20px auto;
+      width: fit-content;
     }
     .cell {
-      width: 10vw;
-      height: 10vw;
+      width: 60px;
+      height: 60px;
       background-color: #fff;
       border: 1px solid #ccc;
-      font-size: 10px;
-      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 12px;
+      position: relative;
     }
     .task {
       background-color: #f8bbd0;
@@ -40,26 +38,40 @@
       position: absolute;
       bottom: 2px;
       right: 2px;
-      font-size: 9px;
-      background: #ec407a;
-      color: white;
-      border-radius: 3px;
-      padding: 1px 3px;
+      font-size: 10px;
     }
     button {
-      padding: 12px 24px;
+      padding: 10px 20px;
       font-size: 16px;
       background-color: #ec407a;
       color: white;
       border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    #taskBox img {
-      max-width: 150px;
       border-radius: 8px;
-      margin-top: 10px;
+      cursor: pointer;
+    }
+    #modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    #modal img {
+      max-width: 90%;
+      max-height: 90%;
+      border: 5px solid white;
+      border-radius: 12px;
+    }
+    #modal span {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      color: white;
+      font-size: 30px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -68,107 +80,114 @@
   <div id="board"></div>
   <button onclick="rollDice()">Kocok Dadu 🎲</button>
   <p id="status">Giliran: Player 1</p>
-  <div id="taskBox"></div>
+  <p id="taskBox"></p>
+
+  <!-- Modal -->
+  <div id="modal" onclick="closeModal()">
+    <span onclick="closeModal()">×</span>
+    <img id="modal-img" src="" />
+  </div>
 
   <script>
+    const tasks = [
+      { name: "Ciuman", duration: 2, image: "cium.jpg" },
+      { name: "Pijat Pundak", duration: 3, image: "pijat_pundak.jpg" },
+      { name: "Bisik Erotis", duration: 2, image: "bisik_erotis.jpg" },
+      { name: "Genggam Tangan", duration: 3, image: "genggam_tangan.jpg" },
+      { name: "Usap Pipi", duration: 2, image: "usap_pipi.jpg" },
+      { name: "Eye Contact", duration: 3, image: "eye_contact.jpg" },
+      { name: "Cium Leher", duration: 2, image: "cium_leher.jpg" },
+      { name: "Cium Tangan", duration: 3, image: "cium_tangan.jpg" },
+      { name: "Elus Paha", duration: 2, image: "elus_paha.jpg" },
+      { name: "Peluk Erat", duration: 3, image: "peluk_erat.jpg" },
+      { name: "Cium Dahi", duration: 2, image: "cium_dahi.jpg" },
+      { name: "Pijat Kaki", duration: 3, image: "pijat_kaki.jpg" },
+      { name: "Bisik 'I want you'", duration: 2, image: "bisik_iwantyou.jpg" },
+      { name: "Tatap Lama", duration: 3, image: "tatap_lama.jpg" },
+      { name: "Cium Pundak", duration: 2, image: "cium_pundak.jpg" },
+      { name: "Gosok Punggung", duration: 3, image: "gosok_punggung.jpg" },
+      { name: "Mainkan Rambut", duration: 2, image: "mainkan_rambut.jpg" },
+      { name: "Bisik di Telinga", duration: 3, image: "bisik_telinga.jpg" },
+      { name: "Pegang Pinggang", duration: 2, image: "pegang_pinggang.jpg" },
+      { name: "Cium Bibir", duration: 3, image: "cium_bibir.jpg" },
+      { name: "Mainkan Jari", duration: 2, image: "mainkan_jari.jpg" },
+      { name: "Sentuh Pinggul", duration: 3, image: "sentuh_pinggul.jpg" },
+      { name: "Kecup Hidung", duration: 2, image: "kecup_hidung.jpg" },
+      { name: "Cium Paha", duration: 3, image: "cium_paha.jpg" },
+      { name: "Elus Perut", duration: 2, image: "elus_perut.jpg" },
+      { name: "Dekap dari Belakang", duration: 3, image: "peluk_belakang.jpg" },
+      { name: "Gigit Manja", duration: 2, image: "gigit_manja.jpg" },
+      { name: "Mainkan Leher", duration: 3, image: "mainkan_leher.jpg" },
+      { name: "Bisik Nama Dia", duration: 2, image: "bisik_nama.jpg" },
+      { name: "Cium Lengan", duration: 3, image: "cium_lengan.jpg" },
+      { name: "Raba Punggung", duration: 2, image: "raba_punggung.jpg" },
+      { name: "Bermain dengan Lidah", duration: 3, image: "main_lidah.jpg" },
+      { name: "Kiss Challenge", duration: 2, image: "kiss_challenge.jpg" },
+      { name: "Truth Dirty", duration: 3, image: "truth_dirty.jpg" },
+      { name: "Roleplay Mini", duration: 2, image: "roleplay.jpg" },
+      { name: "Tanya Fantasi", duration: 3, image: "tanya_fantasi.jpg" }
+    ];
+
+    const totalCells = 36;
     const board = document.getElementById("board");
     const status = document.getElementById("status");
     const taskBox = document.getElementById("taskBox");
-    const playerPositions = [0, 0];
-    let currentPlayer = 0;
 
-    const tasks = {
-      2: { text: "Tugas 1", duration: "2 menit", img: "img/ciuman.jpg" },
-      4: { text: "Tugas 2", duration: "2 menit", img: "img/pijat.jpg" },
-      6: { text: "Tugas 3", duration: "2 menit", img: "img/bisik.jpg" },
-      8: { text: "Tugas 4", duration: "2 menit", img: "img/tangan.jpg" },
-      10: { text: "Tugas 5", duration: "2 menit", img: "img/bibir.jpg" },
-      12: { text: "Tugas 6", duration: "2 menit", img: "img/tengkuk.jpg" },
-      14: { text: "Tugas 7", duration: "2 menit", img: "img/lengan.jpg" },
-      16: { text: "Tugas 8", duration: "2 menit", img: "img/pipi.jpg" },
-      18: { text: "Tugas 9", duration: "2 menit", img: "img/kaki.jpg" },
-      20: { text: "Tugas 10", duration: "2 menit", img: "img/gelitik.jpg" },
-      22: { text: "Tugas 11", duration: "2 menit", img: "img/fantasi.jpg" },
-      24: { text: "Tugas 12", duration: "2 menit", img: "img/eyecontact.jpg" },
-      26: { text: "Tugas 13", duration: "2 menit", img: "img/telinga.jpg" },
-      28: { text: "Tugas 14", duration: "2 menit", img: "img/peluk.jpg" },
-      30: { text: "Tugas 15", duration: "2 menit", img: "img/tanya.jpg" },
-      32: { text: "Tugas 16", duration: "2 menit", img: "img/paha.jpg" },
-      34: { text: "Tugas 17", duration: "2 menit", img: "img/leher.jpg" },
-      36: { text: "Tugas 18", duration: "2 menit", img: "img/rambut.jpg" },
-      38: { text: "Tugas 19", duration: "2 menit", img: "img/ciumdalam.jpg" },
-      40: { text: "Tugas 20", duration: "2 menit", img: "img/truthdare.jpg" },
-      42: { text: "Tugas 21", duration: "2 menit", img: "img/pelukbelakang.jpg" },
-      44: { text: "Tugas 22", duration: "2 menit", img: "img/tutupmata.jpg" },
-      46: { text: "Tugas 23", duration: "2 menit", img: "img/bisikpujian.jpg" },
-      48: { text: "Tugas 24", duration: "2 menit", img: "img/punggung.jpg" },
-      50: { text: "Tugas 25", duration: "2 menit", img: "img/dada.jpg" },
-      52: { text: "Tugas 26", duration: "2 menit", img: "img/tanya2.jpg" },
-      54: { text: "Tugas 27", duration: "2 menit", img: "img/dagu.jpg" },
-      56: { text: "Tugas 28", duration: "2 menit", img: "img/punggungbawah.jpg" },
-      58: { text: "Tugas 29", duration: "2 menit", img: "img/kuku.jpg" },
-      60: { text: "Tugas 30", duration: "2 menit", img: "img/lutut.jpg" },
-      62: { text: "Tugas 31", duration: "2 menit", img: "img/3cium.jpg" },
-      64: { text: "Tugas 32", duration: "2 menit", img: "img/tangancium.jpg" },
-      66: { text: "Tugas 33", duration: "2 menit", img: "img/gilirannya.jpg" },
-      68: { text: "Tugas 34", duration: "2 menit", img: "img/nakal.jpg" },
-      70: { text: "Tugas 35", duration: "2 menit", img: "img/akuingin.jpg" },
-      72: { text: "Tugas 36", duration: "2 menit", img: "img/goyang.jpg" }
-    };
-
-    function createBoard() {
-      for (let i = 99; i >= 0; i--) {
-        const cell = document.createElement("div");
-        cell.className = "cell";
-        cell.id = `cell-${i}`;
-        cell.innerText = i + 1;
-        if (tasks[i]) cell.classList.add("task");
-        board.appendChild(cell);
+    for (let i = 1; i <= totalCells; i++) {
+      const cell = document.createElement("div");
+      cell.classList.add("cell");
+      if (i <= tasks.length) {
+        cell.classList.add("task");
+        cell.innerHTML = `<div>${i}</div>`;
+      } else {
+        cell.innerText = i;
       }
-      updatePlayerPosition();
+      board.appendChild(cell);
     }
+
+    let positions = [0, 0];
+    let turn = 0;
 
     function rollDice() {
-      const roll = Math.floor(Math.random() * 6) + 1;
-      playerPositions[currentPlayer] += roll;
-      if (playerPositions[currentPlayer] > 99) playerPositions[currentPlayer] = 99;
-
-      updatePlayerPosition();
-
-      const pos = playerPositions[currentPlayer];
-      const tugas = tasks[pos];
-
-      if (tugas) {
-        taskBox.innerHTML = `🔥 Player ${currentPlayer + 1}, tugasmu: ${tugas.text}` +
-          (tugas.duration ? ` (Durasi: ${tugas.duration})` : "") +
-          (tugas.img ? `<br><img src="${tugas.img}" alt="gambar tugas" />` : "");
-      } else {
-        taskBox.innerHTML = `🎉 Player ${currentPlayer + 1}, tidak ada tugas di kotak ini.`;
+      const dice = Math.floor(Math.random() * 6) + 1;
+      positions[turn] = Math.min(positions[turn] + dice, totalCells);
+      updateBoard();
+      if (positions[turn] >= totalCells) {
+        status.innerText = `🎉 Player ${turn + 1} Menang! 🎉`;
+        taskBox.innerHTML = "";
+        return;
       }
-
-      if (pos === 99) {
-        status.innerText = `🎊 Player ${currentPlayer + 1} MENANG! 🎊`;
+      const taskIndex = positions[turn] - 1;
+      if (taskIndex < tasks.length) {
+        const task = tasks[taskIndex];
+        taskBox.innerHTML = `<b>Tugas Foreplay:</b><br>${task.name}<br>⏱️ ${task.duration} menit<br><img src="img/${task.image}" width="200" onclick="showModal('img/${task.image}')" style="cursor:pointer">`;
       } else {
-        currentPlayer = (currentPlayer + 1) % 2;
-        status.innerText = `Giliran: Player ${currentPlayer + 1}`;
+        taskBox.innerHTML = "Lanjut ke kotak berikutnya...";
       }
+      turn = 1 - turn;
+      status.innerText = `Giliran: Player ${turn + 1}`;
     }
 
-    function updatePlayerPosition() {
-      document.querySelectorAll(".player").forEach(el => el.remove());
-      playerPositions.forEach((pos, index) => {
-        const playerDiv = document.createElement("div");
+    function updateBoard() {
+      const cells = document.querySelectorAll(".cell");
+      cells.forEach((cell, i) => {
+        const p1 = positions[0] - 1 === i ? "1" : "";
+        const p2 = positions[1] - 1 === i ? "2" : "";
+        const players = [p1, p2].filter(p => p).join(",");
+        const playerDiv = cell.querySelector(".player") || document.createElement("div");
         playerDiv.className = "player";
-        playerDiv.innerText = `P${index + 1}`;
-        document.getElementById(`cell-${pos}`).appendChild(playerDiv);
+        playerDiv.innerText = players;
+        if (!cell.contains(playerDiv)) cell.appendChild(playerDiv);
       });
     }
 
-    createBoard();
-  </script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
+    function showModal(src) {
+      document.getElementById("modal-img").src = src;
+      document.getElementById("modal").style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("modal").style.display = "none";
     }
   </script>
 </body>
